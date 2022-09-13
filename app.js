@@ -5,37 +5,96 @@ const prevButton = document.querySelector('.play-back');
 const durationTime = document.querySelector('.duration');
 const remainingTime = document.querySelector('.remaining');
 const rangeBar = document.querySelector('.range');
+const musicName = document.querySelector('.music-name');
+const musicImage = document.querySelector('.music-thumb img');
+const playRepeat = document.querySelector(".repeat");
 
 let isPlaying = false;
 let indexSong = 0;
 let timer;
+let isRepeat = false;
+let repeatCount = 0;
 
-const musics = ['TestLoa','EmIu','WalkOnDaStreet','DuaNaoLamEmBuon','NguoiDiBao','MillionDollarBoy'];
-
-displayTimer();
-song.setAttribute("src", `./music/${musics[0]}.mp3`);
+const db = [
+    {
+        "_id": 0,
+        "name": "Test Loa",
+        "file": "TestLoa.mp3",
+        "image": "TestLoa.png"
+    },
+    {
+        "_id": 1,
+        "name": "Đứa nào làm em buồn",
+        "file": "DuaNaoLamEmBuon.mp3",
+        "image": "DuaNaoLamEmBuon.jpg"
+    },
+    {
+        "_id": 2,
+        "name": "Em iu",
+        "file": "EmIu.mp3",
+        "image": "EmIu.jpg"
+    },
+    {
+        "_id": 3,
+        "name": "Million Dollar Boy",
+        "file": "MillionDollarBoy.mp3",
+        "image": "MillionDollarBoy.jpg"
+    },
+    {
+        "_id": 4,
+        "name": "Người Đi Bao",
+        "file": "NguoiDiBao.mp3",
+        "image": "NguoiDiBao.jfif"
+    },
+    {
+        "_id": 5,
+        "name": "Walk On Da Street",
+        "file": "WalkOnDaStreet.mp3",
+        "image": "WalkOnDaStreet.jfif"
+    }
+]
 
 nextButton.addEventListener('click', () => {
     changeSong(1);
 });
+
 prevButton.addEventListener('click', () => {
     changeSong(-1);
 });
 
-song.addEventListener("ended", ()=>changeSong(1));
+playRepeat.addEventListener('click', () => {
+    if (isRepeat) {
+        isRepeat = false;
+        playRepeat.removeAttribute("style");
+    } else {
+        isRepeat = true;
+        playRepeat.style.color = "#ffb86c";
+    }
+});
+
+song.addEventListener("ended", ()=>{
+    repeatCount++;
+    if (isRepeat && repeatCount === 1) {
+        isPlaying = false;
+        playPause();
+    } else {
+        changeSong(1);
+    }
+});
+
 function changeSong(dir){
     if (dir === 1){
         indexSong ++;
-        if (indexSong >= musics.length){
+        if (indexSong >= db.length){
             indexSong = 0;  
         }
     } else if (dir === -1){
         indexSong --;
         if (indexSong < 0){
-            indexSong = musics.length - 1;
+            indexSong = db.length - 1;
         }
     }
-    song.setAttribute("src", `./music/${musics[indexSong]}.mp3`);
+    init(indexSong);
     isPlaying=false;
     playPause();
 }
@@ -51,7 +110,7 @@ function playPause() {
         song.play();
         isPlaying = true;
         playButton.innerHTML = '<ion-icon name="pause"></ion-icon>';
-        timer = setInterval(displayTimer, 500);
+        timer = setInterval(displayTimer, 100);
     }
 }
 
@@ -79,3 +138,12 @@ rangeBar.addEventListener('change',handleChangeBar);
 function handleChangeBar(){
     song.currentTime = rangeBar.value;
 }
+
+function init(indexSong){
+    song.setAttribute("src", `./music/${db[indexSong].file}`);
+    musicImage.setAttribute("src", `./img/${db[indexSong].image}`);
+    musicName.textContent = db[indexSong].name;
+}
+
+displayTimer();
+init(indexSong);
